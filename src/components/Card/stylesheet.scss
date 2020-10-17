@@ -1,0 +1,46 @@
+.Card {
+  width: 41%;
+  /* float: left; */
+  padding: 70px;
+  /* background: lightgray; */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  background-color: white;
+  margin-bottom: 3rem;
+
+  .title {
+    text-align: center;
+    font-size: 1.6rem;
+    color: #6f7287;
+    padding-bottom: 0;
+  }
+
+  .text {
+    font-size: 1.6rem;
+    color: black;
+    padding-bottom: 0;
+    padding: 2rem;
+    font-family: sans-serif;
+    color: #6f7287;
+
+  }
+
+  .up-icon {
+    width: 36px;
+    background: lightgray;
+    padding: 5px;
+    height: 28px;
+    color: white;
+    cursor: pointer;
+    float: right;
+  }
+
+  .down-icon {
+    width: 36px;
+    background: lightgray;
+    padding: 5px;
+    height: 28px;
+    color: white;
+    cursor: pointer;
+    float: right;
+  }
+}
