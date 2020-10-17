@@ -6,11 +6,14 @@ import {Card} from '../index'
 
 import * as firebase from 'firebase';
 
+
 const CORS = "https://cors-anywhere.herokuapp.com/";
 const NEWS_API = 'https://news.google.com/rss/search?q=';
 
 const GOOGLE_SEARCH_IMAGE_META = 'og:image';
 const GOOGLE_SEARCH_DESCRIPTION_META = 'og:description';
+
+var data = require('./data.json');
 
 class HomePage extends Component {
 
@@ -21,67 +24,88 @@ class HomePage extends Component {
             newsArticles: [],
             text: '',
             votes: {},
+            results: [],
         }
     }
 
     handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
-    handleSearchChange = (e, { value }) => {
+
+    componentDidMount() {
+
         const {newsArticles} = this.state;
+        for (var i = 0; i < data.length; i++) {
+            let currentItem = data[i];
+
+            let div = document.createElement('div');
+            div.innerHTML = currentItem.data;
+
+
+            let metaTags = div.getElementsByTagName('meta');
+            var description = "EMPTY";
+            var image = '';
+            for (var j = 0; j < metaTags.length; j++) {
+                let tag = metaTags[j];
+                let property = tag.getAttribute('property');
+                let name = tag.getAttribute('name');
+                if (property === GOOGLE_SEARCH_DESCRIPTION_META
+                    || name === GOOGLE_SEARCH_DESCRIPTION_META) {
+                    description = tag.content;
+                } else if (property === GOOGLE_SEARCH_IMAGE_META
+                    || name === GOOGLE_SEARCH_IMAGE_META) {
+                    image = tag.content;
+                }
+            }
+
+
+            let dataObj = {
+                title: currentItem.title,
+                link: currentItem.link,
+                pubDate: currentItem.pubDate,
+                description: currentItem.description,
+                image,
+                descriptionFetched: description,
+            };
+
+            newsArticles.push(dataObj);
+        }
+
+        const results = newsArticles.map(article => ({
+            "description" : article.title,
+            "image" : article.image,
+        }));
+        this.setState({newsArticles, results});
+
+        const articles = newsArticles.map(article => ({
+            description: article.description,
+            descriptionFetched: article.descriptionFetched,
+            pubDate: article.pubDate,
+            image: article.image,
+            title: article.title,
+
+        }));
+
+        firebase.database().ref('articles').set({
+            articles
+        });
+
+        this.updateVotes();
+    }
+
+    handleSearchChange = (e, { value }) => {
+        var {newsArticles, results} = this.state;
         this.setState({text: value});
+        results = newsArticles.filter(article => article.title.includes(value)).map(article => ({
+                "description" : article.title,
+                "image" : article.image,
+
+        }));
+
+        this.setState({results});
     };
 
     handleSearch = () => {
-        var {text, newsArticles} = this.state;
-        newsArticles = [];
-
-        let val = CORS + NEWS_API + text + '%20' + 'yemen';
-        fetch(val).then(res => {
-           return res.text();
-        }).then(data => {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(data,"text/xml");
-            let items = xmlDoc.getElementsByTagName("item");
-            for (var i = 0; i < 10; i++) {
-                let currentItem = items[i];
-                fetch(CORS + currentItem.getElementsByTagName('link')[0].textContent).then(res => res.text()).then(data => {
-                   let div = document.createElement('div');
-                   div.innerHTML = data;
-
-                    let metaTags = div.getElementsByTagName('meta');
-                    var description = "EMPTY";
-                    var image = '';
-                    for (var i = 0; i < metaTags.length; i++) {
-                        let tag = metaTags[i];
-                        let property = tag.getAttribute('property');
-                        let name = tag.getAttribute('name');
-                        if (property === GOOGLE_SEARCH_DESCRIPTION_META
-                            || name === GOOGLE_SEARCH_DESCRIPTION_META) {
-                            description = tag.content;
-                        } else if (property === GOOGLE_SEARCH_IMAGE_META
-                            || name === GOOGLE_SEARCH_IMAGE_META) {
-                            image = tag.content;
-                        }
-                    }
-                    let dataObj = {
-                        title: currentItem.getElementsByTagName('title')[0].textContent,
-                        link: currentItem.getElementsByTagName('link')[0].textContent,
-                        pubDate: currentItem.getElementsByTagName('pubDate')[0].textContent,
-                        description: currentItem.getElementsByTagName('description')[0].textContent,
-                        image,
-                        descriptionFetched: description,
-                    };
-                    newsArticles.push(dataObj);
-                    this.setState({newsArticles});
-
-                    localStorage['test-articles'] = JSON.stringify(newsArticles);
-                    this.updateVotes();
-                });
-            }
-        });
-
-
-
+        const {newsArticles} = this.state;
     };
 
     handleVote = (url, isUpvote) => {
@@ -109,8 +133,21 @@ class HomePage extends Component {
         this.setState({votes});
     };
 
+    handleResultSelect = (e, data) => {
+        let description = data.result.description;
+        let elements = document.getElementsByClassName('Card');
+        for (var i = 0; i < elements.length; i++) {
+            if (elements[i].dataset['id'] === description) {
+                console.log('found');
+                elements[i].scrollIntoView();
+            }
+        }
+    };
+
     render() {
-        var {activeItem, newsArticles, votes} = this.state;
+        var {activeItem, newsArticles, votes, results, text} = this.state;
+
+        console.log(results);
 
         let maxCount = 0;
         Object.keys(votes).forEach(key => {
@@ -120,12 +157,13 @@ class HomePage extends Component {
             let upvotes = votes[a.link + '-upvotes'] || 0;
             let downvotes = votes[a.link + '-downvotes'] || 0;
 
-            let percentA = Math.round(100 * upvotes / (upvotes + downvotes));
+            let percentA = Math.round(100 * upvotes / (upvotes + downvotes + 1));
 
             let upvotesB = votes[b.link + '-upvotes'] || 0;
             let downvotesB = votes[b.link + '-downvotes'] || 0;
 
             let percentB = Math.round(100 * upvotesB / (upvotesB + downvotesB + 1));
+
            return percentB - percentA;
         });
 
@@ -140,7 +178,7 @@ class HomePage extends Component {
                <Card
                    percent={percent}
                    title={article.title}
-                   description={article.descriptionFetched}
+                   description={article.descriptionFetched.replace(/[\u{0080}-\u{FFFF}]/gu,"")}
                    image={article.image}
                    pubDate={article.pubDate}
                    link={article.link}
@@ -156,11 +194,15 @@ class HomePage extends Component {
             <div className="HomePage">
                 <h3 className="title">HackNews</h3>
                 <Search
+                    value={text}
+                    loading={false}
+                    results={results}
+                    onResultSelect={(e, data) => this.handleResultSelect(e, data)}
                     onSearchChange={this.handleSearchChange}
                     className="search"/>
                     <br/>
                     <br/>
-                <Button className="button-og" onClick={this.handleSearch}>Search</Button>
+                {/*<Button className="button-og" onClick={this.handleSearch}>Search</Button>*/}
                 <br/>
                 <br/>
                 <MenuCustom activeItem={activeItem} handleTabChange={this.handleItemClick}/>

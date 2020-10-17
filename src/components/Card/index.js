@@ -28,7 +28,18 @@ class Card extends Component {
         let card = document.getElementById(this.props.link);
         let bar = card.getElementsByClassName('bar')[0];
         bar.style.background = color;
+    }
 
+    componentDidMount() {
+        const customScale = scaleLinear()
+            .domain([1, 100])
+            .range(['#FF0000','#00FF00']);
+
+        let color = customScale(this.props.percent);
+
+        let card = document.getElementById(this.props.link);
+        let bar = card.getElementsByClassName('bar')[0];
+        bar.style.background = color;
     }
 
     render() {
@@ -38,7 +49,7 @@ class Card extends Component {
 
 
         return (
-            <div id={link} className="Card">
+            <div data-id={title} id={link} className="Card">
                 <Progress percent={percent} progress color="red" />
                 <Popup
                     trigger={<Icon style={isUpvote !== undefined && isUpvote ? {backgroundColor: 'palevioletred'} : {}} onClick={() => this.handleIconClick(true)} className="down-icon" size='large' name="chevron up"/>}
