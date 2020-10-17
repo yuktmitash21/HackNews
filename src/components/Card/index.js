@@ -50,7 +50,7 @@ class Card extends Component {
 
         return (
             <div data-id={title} id={link} className="Card">
-                <Progress percent={percent} progress color="red" />
+                <Progress percent={percent} progress color="red" >Accuracy of News</Progress>
                 <Popup
                     trigger={<Icon style={isUpvote !== undefined && isUpvote ? {backgroundColor: 'palevioletred'} : {}} onClick={() => this.handleIconClick(true)} className="down-icon" size='large' name="chevron up"/>}
                     content={upvotes + ' Realvotes'}

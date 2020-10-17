@@ -82,6 +82,8 @@ class HomePage extends Component {
             pubDate: article.pubDate,
             image: article.image,
             title: article.title,
+            upvotes: localStorage[article.link + '-upvotes'] ? Number.parseInt(localStorage[article.link + '-upvotes']) : 0,
+            downvotes: localStorage[article.link + '-downvotes'] ? Number.parseInt(localStorage[article.link + '-downvotes']) : 0,
 
         }));
 
@@ -204,8 +206,6 @@ class HomePage extends Component {
                     <br/>
                 {/*<Button className="button-og" onClick={this.handleSearch}>Search</Button>*/}
                 <br/>
-                <br/>
-                <MenuCustom activeItem={activeItem} handleTabChange={this.handleItemClick}/>
                 <br/>
                 {data}
             </div>
