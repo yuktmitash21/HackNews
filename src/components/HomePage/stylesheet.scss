@@ -1,0 +1,21 @@
+.HomePage {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  background-color: white;
+  width: 95%;
+  margin: auto;
+  height: 70vh;
+  margin-top: 2rem;
+
+  .title {
+    text-align: center;
+    font-size: 1.6rem;
+    color: #6f7287;
+    padding: 3rem;
+  }
+
+  .search {
+    float: left;
+    margin-top: 0;
+    padding-left: 2rem;
+  }
+}
