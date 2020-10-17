@@ -13,6 +13,8 @@
     font-size: 1.6rem;
     color: #6f7287;
     padding-bottom: 0;
+    margin-top: -5rem;
+    margin-right: 2rem;
   }
 
   .text {
@@ -25,7 +27,7 @@
   }
 
   .img {
-    width: 200px;
+    width: 150px;
     height: 163px !important;
     height: auto;
     float: left;
@@ -35,10 +37,10 @@
 
   .up-icon {
     width: 50px;
-    background: lightgray;
-    padding: 5px;
-    height: 32px;
-    color: white;
+    //background: lightgray;
+    padding: 10px;
+    height: 38px;
+    color: black;
     cursor: pointer;
     float: right;
     font-size: 23px !important
@@ -46,12 +48,20 @@
 
   .down-icon {
     width: 50px;
-    background: lightgray;
-    padding: 5px;
-    height: 32px;
-    color: white;
+    //background: lightgray;
+    padding: 10px;
+    height: 38px;
+    color: black;
     cursor: pointer;
     float: right;
     font-size: 23px !important;
+  }
+
+  .down-icon:hover {
+    background-color: palevioletred;
+  }
+
+  .up-icon:hover {
+    background-color: palevioletred;
   }
 }

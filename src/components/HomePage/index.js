@@ -4,6 +4,8 @@ import { Search, Grid, Header, Segment, Menu, Button } from 'semantic-ui-react'
 import {MenuCustom} from "../index";
 import {Card} from '../index'
 
+import * as firebase from 'firebase';
+
 const CORS = "https://cors-anywhere.herokuapp.com/";
 const NEWS_API = 'https://news.google.com/rss/search?q=';
 
@@ -26,7 +28,6 @@ class HomePage extends Component {
 
     handleSearchChange = (e, { value }) => {
         const {newsArticles} = this.state;
-        console.log(value);
         this.setState({text: value});
     };
 
@@ -38,7 +39,6 @@ class HomePage extends Component {
         fetch(val).then(res => {
            return res.text();
         }).then(data => {
-            console.log(data);
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(data,"text/xml");
             let items = xmlDoc.getElementsByTagName("item");
@@ -71,9 +71,11 @@ class HomePage extends Component {
                         image,
                         descriptionFetched: description,
                     };
-                    console.log(dataObj);
                     newsArticles.push(dataObj);
                     this.setState({newsArticles});
+
+                    localStorage['test-articles'] = JSON.stringify(newsArticles);
+                    this.updateVotes();
                 });
             }
         });
@@ -84,15 +86,25 @@ class HomePage extends Component {
 
     handleVote = (url, isUpvote) => {
         let votes = localStorage[url] ? Number.parseInt(localStorage[url]) : 0;
-        votes += (isUpvote ? 1 : 0);
+        votes += (isUpvote ? 1 : -1);
         localStorage[url] = votes;
+
+        let upvotes = isUpvote ? 1 : 0;
+        let downvotes = !isUpvote ? 1 : 0;
+
+
+        localStorage[url + '-upvotes'] = localStorage[url + '-upvotes'] ? Number.parseInt(localStorage[url + '-upvotes']) + upvotes : upvotes;
+        localStorage[url + '-downvotes'] = localStorage[url + '-downvotes'] ? Number.parseInt(localStorage[url + '-downvotes'])  + downvotes : downvotes;
+
         this.updateVotes();
     };
 
     updateVotes = () => {
         const {votes, newsArticles} = this.state;
         newsArticles.forEach((article) => {
-           votes[article.link] = localStorage[article.link] ? Number.parseInt(localStorage[article.link]) : 0;
+            votes[article.link] = localStorage[article.link] ? Number.parseInt(localStorage[article.link]) : 0;
+            votes[article.link + '-upvotes'] = localStorage[article.link + '-upvotes'] ? Number.parseInt(localStorage[article.link + '-upvotes']) : 0;
+            votes[article.link + '-downvotes'] = localStorage[article.link + '-downvotes'] ? Number.parseInt(localStorage[article.link + '-downvotes']) : 0;
         });
         this.setState({votes});
     };
@@ -100,27 +112,45 @@ class HomePage extends Component {
     render() {
         var {activeItem, newsArticles, votes} = this.state;
 
-        console.log("rerender");
-
+        let maxCount = 0;
+        Object.keys(votes).forEach(key => {
+            maxCount = Math.max(votes[key], maxCount);
+        });
         newsArticles = newsArticles.sort((a, b) => {
-           let first = votes[a] || 0;
-           let sec = votes[b] || 0;
-           return first - sec;
+            let upvotes = votes[a.link + '-upvotes'] || 0;
+            let downvotes = votes[a.link + '-downvotes'] || 0;
+
+            let percentA = Math.round(100 * upvotes / (upvotes + downvotes));
+
+            let upvotesB = votes[b.link + '-upvotes'] || 0;
+            let downvotesB = votes[b.link + '-downvotes'] || 0;
+
+            let percentB = Math.round(100 * upvotesB / (upvotesB + downvotesB + 1));
+           return percentB - percentA;
         });
 
-        console.log(newsArticles);
 
-        const data = newsArticles.map(article => (
-            <Card
-                title={article.title}
-                description={article.descriptionFetched}
-                image={article.image}
-                pubDate={article.pubDate}
-                link={article.link}
-                handleVote={this.handleVote}
-            />
 
-        ));
+       let data = newsArticles.map(article => {
+           let upvotes = votes[article.link + '-upvotes'] || 0;
+           let downvotes = votes[article.link + '-downvotes'] || 0;
+
+           let percent = Math.round(100 * upvotes / (upvotes + downvotes));
+           return (
+               <Card
+                   percent={percent}
+                   title={article.title}
+                   description={article.descriptionFetched}
+                   image={article.image}
+                   pubDate={article.pubDate}
+                   link={article.link}
+                   upvotes={votes[article.link + '-upvotes'] || 0}
+                   downvotes={votes[article.link + '-downvotes'] || 0}
+                   handleVote={this.handleVote}
+               />
+
+           )
+       });
 
         return (
             <div className="HomePage">

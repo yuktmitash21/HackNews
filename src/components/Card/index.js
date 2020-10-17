@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import './stylesheet.scss';
-import {Image, Icon} from 'semantic-ui-react'
+import {Image, Icon, Popup, Progress} from 'semantic-ui-react'
 import moment from 'moment';
+import { scaleLinear } from "d3-scale"
 
 class Card extends Component {
 
@@ -17,14 +18,40 @@ class Card extends Component {
         this.props.handleVote(this.props.link, isUpvote);
     };
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const customScale = scaleLinear()
+            .domain([1, 100])
+            .range(['#FF0000','#00FF00']);
+
+        let color = customScale(this.props.percent);
+
+        let card = document.getElementById(this.props.link);
+        let bar = card.getElementsByClassName('bar')[0];
+        bar.style.background = color;
+
+    }
+
     render() {
-        const {title, description, image, pubDate, link} = this.props;
+        const {title, description, image, pubDate, link, upvotes, downvotes, percent} = this.props;
         const {isUpvote} = this.state;
 
+
+
         return (
-            <div className="Card">
-                <Icon style={isUpvote !== undefined && isUpvote ? {backgroundColor: 'palevioletred'} : {}} onClick={() => this.handleIconClick(true)} className="down-icon" size='large' name="arrow up"/>
-                <Icon style={isUpvote !== undefined && !isUpvote ? {backgroundColor: 'palevioletred'} : {}} onClick={() => this.handleIconClick(false)}  className="up-icon" size='large' name="arrow down"/>
+            <div id={link} className="Card">
+                <Progress percent={percent} progress color="red" />
+                <Popup
+                    trigger={<Icon style={isUpvote !== undefined && isUpvote ? {backgroundColor: 'palevioletred'} : {}} onClick={() => this.handleIconClick(true)} className="down-icon" size='large' name="chevron up"/>}
+                    content={upvotes + ' Realvotes'}
+                    inverted
+                />
+                <br/>
+                <br/>
+                <Popup
+                    trigger={ <Icon style={isUpvote !== undefined && !isUpvote ? {backgroundColor: 'palevioletred'} : {}} onClick={() => this.handleIconClick(false)}  className="up-icon" size='large' name="chevron down"/>}
+                    content={downvotes + ' Fakevotes'}
+                    inverted
+                />
                 <h3 className="title">
                     {title}
                 </h3>
