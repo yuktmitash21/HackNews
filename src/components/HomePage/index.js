@@ -92,7 +92,7 @@ class HomePage extends Component {
     updateVotes = () => {
         const {votes, newsArticles} = this.state;
         newsArticles.forEach((article) => {
-           votes[article.url] = localStorage[article.url] ? Number.parseInt(localStorage[article.url]) : 0;
+           votes[article.link] = localStorage[article.link] ? Number.parseInt(localStorage[article.link]) : 0;
         });
         this.setState({votes});
     };

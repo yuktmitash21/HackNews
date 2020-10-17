@@ -25,10 +25,14 @@ class Card extends Component {
             <div className="Card">
                 <Icon style={isUpvote !== undefined && isUpvote ? {backgroundColor: 'palevioletred'} : {}} onClick={() => this.handleIconClick(true)} className="down-icon" size='large' name="arrow up"/>
                 <Icon style={isUpvote !== undefined && !isUpvote ? {backgroundColor: 'palevioletred'} : {}} onClick={() => this.handleIconClick(false)}  className="up-icon" size='large' name="arrow down"/>
-                <h3 className="title">{title}</h3>
+                <h3 className="title">
+                    {title}
+                </h3>
                 <span className="text">{moment(new Date(pubDate)).fromNow()}</span>
-                <p className="text">{description}</p>
-                <Image size='medium' wrapped src={image}/>
+                <p className="text">
+                    <img className="img" src={image}/>
+                    {description}
+                </p>
                 <a href={link}/>
 
             </div>
