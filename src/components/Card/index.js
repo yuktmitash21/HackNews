@@ -47,12 +47,8 @@ class Card extends Component {
     }
 
     componentDidMount() {
-        const customScale = scaleLinear()
-            .domain([1, 100])
-            .range(['#FF0000','#00FF00']);
 
-        let color = customScale(this.props.percent);
-
+        let color = this.getColor();
         let card = document.getElementById(this.props.link);
         if (!card) return;
         let bar = card.getElementsByClassName('bar')[0];
@@ -63,6 +59,15 @@ class Card extends Component {
         });
 
     }
+
+    getColor = () => {
+        const customScale = scaleLinear()
+            .domain([1, 100])
+            .range(['#FF0000','#00FF00']);
+
+        let color = customScale(this.props.percent);
+        return color;
+    };
 
     setText = (text) => {
         const {sampleComments} = this.state;
@@ -90,7 +95,7 @@ class Card extends Component {
             <div onClick={this.handleClick} className = "WholeNews">
                 <div data-id={title} id={link} className="Card" style = {this.state.cardStyle} onMouseEnter={this.hoverInAnimation} onMouseLeave={this.hoverOutAnimation}>
                     <Progress percent={percent} progress color="red"/>
-                    <h3 className="credibility">Credibility</h3>
+                    <h3 style={{color: this.getColor()}} className="credibility">Credibility</h3>
                     <Popup
                         trigger={<Icon style={isUpvote !== undefined && isUpvote ? {backgroundColor: 'palevioletred'} : {}} onClick={() => this.handleIconClick(true)} className="down-icon" size='large' name="chevron up"/>}
                         content={upvotes + ' Realvotes'}
