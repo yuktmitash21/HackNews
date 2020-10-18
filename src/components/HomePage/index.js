@@ -64,6 +64,7 @@ class HomePage extends Component {
 
 
             let dataObj = {
+                html: currentItem.data,
                 title: currentItem.title,
                 link: currentItem.link,
                 pubDate: currentItem.pubDate,
@@ -192,6 +193,7 @@ class HomePage extends Component {
            let percent = Math.round(100 * upvotes / (upvotes + downvotes + 1));
            return (
                <Card
+                   html={article.html}
                    percent={percent}
                    title={article.title}
                    description={article.descriptionFetched.replace(/[\u{0080}-\u{FFFF}]/gu,"")}
