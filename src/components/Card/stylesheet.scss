@@ -10,7 +10,7 @@
   height: 45rem;
   transition: 1.5s;
   overflow-y: hidden;
-  cursor: pointer;
+  //cursor: pointer;
   .title {
     text-align: center;
     font-size: 1.6rem;
@@ -41,6 +41,14 @@
     color: #6f7287;
     margin: auto;
     width: 90%;
+  }
+
+  .text:hover {
+    color: black;
+  }
+
+  .hover-area {
+    color: black;
   }
 
   .text-date {

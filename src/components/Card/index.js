@@ -84,8 +84,7 @@ class Card extends Component {
     };
 
     handleClick = () => {
-        const {link} = this.props;
-        window.open(link);
+
     };
 
     handleOpen = () => {
@@ -137,12 +136,7 @@ class Card extends Component {
         const {isUpvote, open} = this.state;
 
         return (
-            <Modal
-                id={link + '-modal'}
-                onClose={() => this.setState({open: false})}
-                onOpen={() => this.handleOpen()}
-                open={open}
-                trigger={
+
                 <div className="WholeNews">
                     <div data-id={title} id={link} className="Card" style={this.state.cardStyle}
                          onMouseEnter={this.hoverInAnimation} onMouseLeave={this.hoverOutAnimation}>
@@ -166,23 +160,29 @@ class Card extends Component {
                             content={downvotes + ' Fakevotes'}
                             inverted
                         />
-                        <h3 onClick={this.handleClick} className="title">
-                            {title}
-                        </h3>
-                        <span className="text-date">{moment(new Date(pubDate)).fromNow()}</span>
-                        <p className="text">
-                            <img className="img" src={image}/>
-                            {description}
-                        </p>
-                        <a href={link}/>
+                        <Modal
+                            id={link + '-modal'}
+                            onClose={() => this.setState({open: false})}
+                            onOpen={() => this.handleOpen()}
+                            open={open}
+                            trigger={
+                                <div className="hover-area" style={{cursor: 'pointer'}}>
+                                <h3 onClick={this.handleClick} className="title">
+                                    {title}
+                                </h3>
+                                <span className="text-date">{moment(new Date(pubDate)).fromNow()}</span>
+                                <p className="text">
+                                    <img className="img" src={image}/>
+                                    {description}
+                                </p>
+                            </div>}><iframe className="frame" src={link} id={link+ '-iframe'}/>
+                        </Modal>
+
                     </div>
                     <div className="CommentSection" style={this.state.commentStyle}>
                         <CommentSection id={this.props.link}/>
                     </div>
                 </div>
-            }>
-                <iframe className="frame" src={link} id={link+ '-iframe'}/>
-            </Modal>
         );
 
     }
