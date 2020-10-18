@@ -58,7 +58,7 @@ class Card extends Component {
         let bar = card.getElementsByClassName('bar')[0];
         bar.style.background = color;
 
-        firebase.database().ref(`comments/${this.stringify(this.props.link)}`).on('value', function(snapshot) {
+        firebase.database().ref(`comments/${this.stringify(this.props.link)}`).on('value', (snapshot) => {
             this.setState({comments: snapshot.val()});
         });
 
