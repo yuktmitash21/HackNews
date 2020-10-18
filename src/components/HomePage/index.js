@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import './stylesheet.scss';
-import { Search, Grid, Header, Segment, Menu, Button } from 'semantic-ui-react'
+import { Search, Grid, Header, Segment, Menu, Button, Image } from 'semantic-ui-react'
 import {MenuCustom} from "../index";
 import {Card} from '../index'
+import logo from '../Images/Hack_News_Logo.png'
 
 import * as firebase from 'firebase';
 
@@ -12,6 +13,9 @@ const NEWS_API = 'https://news.google.com/rss/search?q=';
 
 const GOOGLE_SEARCH_IMAGE_META = 'og:image';
 const GOOGLE_SEARCH_DESCRIPTION_META = 'og:description';
+
+const USE_LOCAL = false;
+
 
 var data = require('./data.json');
 
@@ -25,6 +29,7 @@ class HomePage extends Component {
             text: '',
             votes: {},
             results: [],
+            fireBaseVotes: {},
         }
     }
 
@@ -59,6 +64,7 @@ class HomePage extends Component {
 
 
             let dataObj = {
+                html: currentItem.data,
                 title: currentItem.title,
                 link: currentItem.link,
                 pubDate: currentItem.pubDate,
@@ -76,28 +82,24 @@ class HomePage extends Component {
         }));
         this.setState({newsArticles, results});
 
-        const articles = newsArticles.map(article => ({
-            description: article.description,
-            descriptionFetched: article.descriptionFetched,
-            pubDate: article.pubDate,
-            image: article.image,
-            title: article.title,
-            upvotes: localStorage[article.link + '-upvotes'] ? Number.parseInt(localStorage[article.link + '-upvotes']) : 0,
-            downvotes: localStorage[article.link + '-downvotes'] ? Number.parseInt(localStorage[article.link + '-downvotes']) : 0,
-
-        }));
-
-        firebase.database().ref('articles').set({
-            articles
-        });
+        this.fetchVotes();
 
         this.updateVotes();
     }
 
+    fetchVotes = () => {
+        firebase.database().ref('json').on('value', (snapshot) => {
+            let data = snapshot.val();
+            let dict = data ? JSON.parse(data) : {};
+            console.log(dict);
+            this.setState({fireBaseVotes: dict});
+        });
+    };
+
     handleSearchChange = (e, { value }) => {
         var {newsArticles, results} = this.state;
         this.setState({text: value});
-        results = newsArticles.filter(article => article.title.includes(value)).map(article => ({
+        results = newsArticles.filter(article => article.title.toLowerCase().includes(value.toLowerCase()) || article.descriptionFetched.toLowerCase().includes(value.toLowerCase())).map(article => ({
                 "description" : article.title,
                 "image" : article.image,
 
@@ -111,6 +113,7 @@ class HomePage extends Component {
     };
 
     handleVote = (url, isUpvote) => {
+        const {fireBaseVotes} = this.state;
         let votes = localStorage[url] ? Number.parseInt(localStorage[url]) : 0;
         votes += (isUpvote ? 1 : -1);
         localStorage[url] = votes;
@@ -121,6 +124,15 @@ class HomePage extends Component {
 
         localStorage[url + '-upvotes'] = localStorage[url + '-upvotes'] ? Number.parseInt(localStorage[url + '-upvotes']) + upvotes : upvotes;
         localStorage[url + '-downvotes'] = localStorage[url + '-downvotes'] ? Number.parseInt(localStorage[url + '-downvotes'])  + downvotes : downvotes;
+
+        let stringifyUrl = this.stringify(url);
+        fireBaseVotes[stringifyUrl + '-upvotes'] = fireBaseVotes[stringifyUrl + '-upvotes'] ? fireBaseVotes[stringifyUrl + '-upvotes'] + upvotes : upvotes;
+        fireBaseVotes[stringifyUrl + '-downvotes'] = fireBaseVotes[stringifyUrl + '-downvotes'] ? fireBaseVotes[stringifyUrl + '-downvotes'] + downvotes : downvotes;
+
+        console.log(fireBaseVotes);
+        firebase.database().ref('json').set(JSON.stringify(fireBaseVotes));
+
+        this.setState({fireBaseVotes});
 
         this.updateVotes();
     };
@@ -146,46 +158,50 @@ class HomePage extends Component {
         }
     };
 
+    stringify = (val) => {
+        return val.replaceAll(':', '').replaceAll('.', '').replaceAll('/', '');
+    };
+
+
     render() {
-        var {activeItem, newsArticles, votes, results, text} = this.state;
+        var {activeItem, newsArticles, votes, results, text, fireBaseVotes} = this.state;
 
         console.log(results);
+        console.log(fireBaseVotes);
 
-        let maxCount = 0;
-        Object.keys(votes).forEach(key => {
-            maxCount = Math.max(votes[key], maxCount);
-        });
         newsArticles = newsArticles.sort((a, b) => {
-            let upvotes = votes[a.link + '-upvotes'] || 0;
-            let downvotes = votes[a.link + '-downvotes'] || 0;
+            let upvotes = fireBaseVotes[this.stringify(a.link) + '-upvotes'] || 0;
+            let downvotes = fireBaseVotes[this.stringify(a.link) + '-downvotes'] || 0;
 
-            let percentA = Math.round(100 * upvotes / (upvotes + downvotes + 1));
+            let percentA = upvotes / (upvotes + downvotes + 1);
+            console.log(percentA);
 
-            let upvotesB = votes[b.link + '-upvotes'] || 0;
-            let downvotesB = votes[b.link + '-downvotes'] || 0;
+            let upvotesB = fireBaseVotes[this.stringify(b.link) + '-upvotes'] || 0;
+            let downvotesB = fireBaseVotes[this.stringify(b.link) + '-downvotes'] || 0;
 
-            let percentB = Math.round(100 * upvotesB / (upvotesB + downvotesB + 1));
+            let percentB = upvotesB / (upvotesB + downvotesB + 1);
+            console.log(percentB);
 
            return percentB - percentA;
         });
 
 
-
        let data = newsArticles.map(article => {
-           let upvotes = votes[article.link + '-upvotes'] || 0;
-           let downvotes = votes[article.link + '-downvotes'] || 0;
+           let upvotes = fireBaseVotes[this.stringify(article.link) + '-upvotes'] || 0;
+           let downvotes = fireBaseVotes[this.stringify(article.link) + '-downvotes'] || 0;
 
-           let percent = Math.round(100 * upvotes / (upvotes + downvotes));
+           let percent = Math.round(100 * upvotes / (upvotes + downvotes + 1));
            return (
                <Card
+                   html={article.html}
                    percent={percent}
                    title={article.title}
                    description={article.descriptionFetched.replace(/[\u{0080}-\u{FFFF}]/gu,"")}
                    image={article.image}
                    pubDate={article.pubDate}
                    link={article.link}
-                   upvotes={votes[article.link + '-upvotes'] || 0}
-                   downvotes={votes[article.link + '-downvotes'] || 0}
+                   upvotes={fireBaseVotes[this.stringify(article.link) + '-upvotes'] || 0}
+                   downvotes={fireBaseVotes[this.stringify(article.link) + '-downvotes'] || 0}
                    handleVote={this.handleVote}
                />
 
@@ -195,6 +211,8 @@ class HomePage extends Component {
         return (
             <div className="HomePage">
                 <h3 className="title">HackNews</h3>
+                <p className="home-quote">"News for the people. Chosen by the people."</p>
+                <Image className="image-header" src={logo}/>
                 <Search
                     value={text}
                     loading={false}
