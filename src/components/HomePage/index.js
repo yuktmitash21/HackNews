@@ -85,6 +85,18 @@ class HomePage extends Component {
         this.fetchVotes();
 
         this.updateVotes();
+        this.manipulateDom();
+    }
+
+    manipulateDom = () => {
+        // let tag = document.getElementsByClassName('CommentSection');
+        // for (var i = 0; i < tag.length; i++) {
+        //     tag[i].scrollTop = tag[i].scrollHeight;
+        // }
+    };
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        this.manipulateDom();
     }
 
     fetchVotes = () => {
@@ -186,7 +198,7 @@ class HomePage extends Component {
         });
 
 
-       let data = newsArticles.map(article => {
+       let data = newsArticles.map((article, ind) => {
            let upvotes = fireBaseVotes[this.stringify(article.link) + '-upvotes'] || 0;
            let downvotes = fireBaseVotes[this.stringify(article.link) + '-downvotes'] || 0;
 
@@ -203,6 +215,7 @@ class HomePage extends Component {
                    upvotes={fireBaseVotes[this.stringify(article.link) + '-upvotes'] || 0}
                    downvotes={fireBaseVotes[this.stringify(article.link) + '-downvotes'] || 0}
                    handleVote={this.handleVote}
+                   index={ind}
                />
 
            )

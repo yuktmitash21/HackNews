@@ -132,7 +132,7 @@ class Card extends Component {
     };
 
     render() {
-        const {title, description, image, pubDate, link, upvotes, downvotes, percent} = this.props;
+        const {title, description, image, pubDate, link, upvotes, downvotes, percent, index} = this.props;
         const {isUpvote, open} = this.state;
 
         return (
@@ -181,7 +181,10 @@ class Card extends Component {
 
                     </div>
                     <div className="CommentSection" style={this.state.commentStyle}>
-                        <CommentSection id={this.props.link}/>
+                        <CommentSection
+                            id={this.props.link}
+                            index={index}
+                        />
                     </div>
                 </div>
         );
