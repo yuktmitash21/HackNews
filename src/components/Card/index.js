@@ -58,8 +58,8 @@ class Card extends Component {
         let bar = card.getElementsByClassName('bar')[0];
         bar.style.background = color;
 
-        firebase.database().ref(`comments/${this.stringify(this.props.link)}`).on('value', function(snapshot) {
-            console.log(snapshot.val());
+        firebase.database().ref(`comments/${this.stringify(this.props.link)}`).on('value', (snapshot) => {
+            this.setState({comments: snapshot.val()});
         });
 
     }
@@ -70,6 +70,7 @@ class Card extends Component {
         firebase.database().ref(`comments/${this.stringify(this.props.link)}`).set({
             sampleComments
         });
+        this.setState({sampleComments});
     };
 
     stringify = (val) => {
