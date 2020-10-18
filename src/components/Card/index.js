@@ -83,8 +83,8 @@ class Card extends Component {
     };
 
     handleClick = () => {
-        // const {link} = this.props;
-        // window.open(link);
+        const {link} = this.props;
+        window.open(link);
     };
 
     render() {
@@ -92,7 +92,7 @@ class Card extends Component {
         const {isUpvote} = this.state;
 
         return (
-            <div onClick={this.handleClick} className = "WholeNews">
+            <div className = "WholeNews">
                 <div data-id={title} id={link} className="Card" style = {this.state.cardStyle} onMouseEnter={this.hoverInAnimation} onMouseLeave={this.hoverOutAnimation}>
                     <Progress percent={percent} progress color="red"/>
                     <h3 style={{color: this.getColor()}} className="credibility">Credibility</h3>
@@ -108,7 +108,7 @@ class Card extends Component {
                         content={downvotes + ' Fakevotes'}
                         inverted
                     />
-                    <h3 className="title">
+                    <h3 onClick={this.handleClick} className="title">
                         {title}
                     </h3>
                     <span className="text-date">{moment(new Date(pubDate)).fromNow()}</span>
@@ -119,7 +119,7 @@ class Card extends Component {
                     <a href={link}/>
                 </div>
                 <div className="CommentSection" style = {this.state.commentStyle}>
-                    <CommentSection />
+                    <CommentSection id={this.props.link} />
                 </div>
             </div>
         );

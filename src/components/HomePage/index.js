@@ -98,7 +98,7 @@ class HomePage extends Component {
     handleSearchChange = (e, { value }) => {
         var {newsArticles, results} = this.state;
         this.setState({text: value});
-        results = newsArticles.filter(article => article.title.includes(value)).map(article => ({
+        results = newsArticles.filter(article => article.title.toLowerCase().includes(value.toLowerCase()) || article.descriptionFetched.toLowerCase().includes(value.toLowerCase())).map(article => ({
                 "description" : article.title,
                 "image" : article.image,
 
