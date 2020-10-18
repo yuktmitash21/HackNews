@@ -5,6 +5,8 @@ import moment from 'moment';
 import { scaleLinear } from "d3-scale"
 import CommentSection from '../CommentSection/CommentSection';
 
+import * as firebase from 'firebase';
+
 class Card extends Component {
 
     constructor(props) {
@@ -12,7 +14,8 @@ class Card extends Component {
         this.state = {
             isUpvote: undefined,
             cardStyle: {width: '100%'},
-            commentStyle: {width: '100%'}
+            commentStyle: {width: '100%'},
+            comments: [],
         }
     }
 
@@ -54,7 +57,24 @@ class Card extends Component {
         if (!card) return;
         let bar = card.getElementsByClassName('bar')[0];
         bar.style.background = color;
+
+        firebase.database().ref(`comments/${this.stringify(this.props.link)}`).on('value', function(snapshot) {
+            console.log(snapshot.val());
+        });
+
     }
+
+    setText = (text) => {
+        const {sampleComments} = this.state;
+        sampleComments.push(text);
+        firebase.database().ref(`comments/${this.stringify(this.props.link)}`).set({
+            sampleComments
+        });
+    };
+
+    stringify = (val) => {
+        return val.replaceAll(':', '').replaceAll('.', '').replaceAll('/', '');
+    };
 
     render() {
         const {title, description, image, pubDate, link, upvotes, downvotes, percent} = this.props;
