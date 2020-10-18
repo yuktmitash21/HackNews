@@ -175,7 +175,8 @@ class Card extends Component {
                                     <img className="img" src={image}/>
                                     {description}
                                 </p>
-                            </div>}><iframe className="frame" src={link} id={link+ '-iframe'}/>
+                            </div>}>
+                            <iframe className="frame" src={link} id={link+ '-iframe'}/>
                         </Modal>
 
                     </div>
