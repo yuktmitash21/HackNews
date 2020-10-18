@@ -9,6 +9,8 @@
   // min-height: 469px;
   height: 45rem;
   transition: 1.5s;
+  overflow-y: hidden;
+  cursor: pointer;
   .title {
     text-align: center;
     font-size: 1.6rem;
@@ -18,6 +20,14 @@
     margin-right: 2rem;
   }
 
+  .credibility {
+    color: black;
+    font-family: Georgia;
+    margin-top: -2rem;
+    font-size: 1.6rem;
+    color: #6f7287;
+  }
+
   .text {
     font-size: 1.6rem;
     color: black;
@@ -25,6 +35,18 @@
     padding: 2rem;
     font-family: sans-serif;
     color: #6f7287;
+    margin: auto;
+    width: 90%;
+  }
+
+  .text-date {
+    font-size: 1.6rem;
+    color: black;
+    padding-bottom: 0;
+    padding: 2rem;
+    font-family: sans-serif;
+    color: gray;
+    font-style: italic;
   }
 
   .img {
@@ -74,4 +96,8 @@
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+}
+
+.Card:hover {
+  background: lightgray;
 }

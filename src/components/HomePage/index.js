@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import './stylesheet.scss';
-import { Search, Grid, Header, Segment, Menu, Button } from 'semantic-ui-react'
+import { Search, Grid, Header, Segment, Menu, Button, Image } from 'semantic-ui-react'
 import {MenuCustom} from "../index";
 import {Card} from '../index'
+import logo from '../Images/Hack_News_Logo.png'
 
 import * as firebase from 'firebase';
 
@@ -12,6 +13,7 @@ const NEWS_API = 'https://news.google.com/rss/search?q=';
 
 const GOOGLE_SEARCH_IMAGE_META = 'og:image';
 const GOOGLE_SEARCH_DESCRIPTION_META = 'og:description';
+
 
 var data = require('./data.json');
 
@@ -159,12 +161,12 @@ class HomePage extends Component {
             let upvotes = votes[a.link + '-upvotes'] || 0;
             let downvotes = votes[a.link + '-downvotes'] || 0;
 
-            let percentA = Math.round(100 * upvotes / (upvotes + downvotes + 1));
+            let percentA = upvotes / (upvotes + downvotes);
 
             let upvotesB = votes[b.link + '-upvotes'] || 0;
             let downvotesB = votes[b.link + '-downvotes'] || 0;
 
-            let percentB = Math.round(100 * upvotesB / (upvotesB + downvotesB + 1));
+            let percentB = upvotesB / (upvotesB + downvotesB);
 
            return percentB - percentA;
         });
@@ -195,6 +197,8 @@ class HomePage extends Component {
         return (
             <div className="HomePage">
                 <h3 className="title">HackNews</h3>
+                <p className="home-quote">"News for the people. Chosen by the people."</p>
+                <Image className="image-header" src={logo}/>
                 <Search
                     value={text}
                     loading={false}

@@ -77,14 +77,20 @@ class Card extends Component {
         return val.replaceAll(':', '').replaceAll('.', '').replaceAll('/', '');
     };
 
+    handleClick = () => {
+        // const {link} = this.props;
+        // window.open(link);
+    };
+
     render() {
         const {title, description, image, pubDate, link, upvotes, downvotes, percent} = this.props;
         const {isUpvote} = this.state;
 
         return (
-            <div className = "WholeNews">
+            <div onClick={this.handleClick} className = "WholeNews">
                 <div data-id={title} id={link} className="Card" style = {this.state.cardStyle} onMouseEnter={this.hoverInAnimation} onMouseLeave={this.hoverOutAnimation}>
-                    <Progress percent={percent} progress color="red" >Accuracy of News</Progress>
+                    <Progress percent={percent} progress color="red"/>
+                    <h3 className="credibility">Credibility</h3>
                     <Popup
                         trigger={<Icon style={isUpvote !== undefined && isUpvote ? {backgroundColor: 'palevioletred'} : {}} onClick={() => this.handleIconClick(true)} className="down-icon" size='large' name="chevron up"/>}
                         content={upvotes + ' Realvotes'}
@@ -100,7 +106,7 @@ class Card extends Component {
                     <h3 className="title">
                         {title}
                     </h3>
-                    <span className="text">{moment(new Date(pubDate)).fromNow()}</span>
+                    <span className="text-date">{moment(new Date(pubDate)).fromNow()}</span>
                     <p className="text">
                         <img className="img" src={image}/>
                         {description}
