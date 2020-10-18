@@ -1,14 +1,14 @@
 .Card {
-  width: 41%;
+  width: 100%;
   /* float: left; */
-  padding: 25px;
+  padding: 70px;
   /* background: lightgray; */
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
   background-color: white;
   margin-bottom: 3rem;
-  min-height: 469px;
-  font-family: ui-serif;
-
+  // min-height: 469px;
+  height: 45rem;
+  transition: 1.5s;
   .title {
     text-align: center;
     font-size: 1.6rem;
@@ -68,4 +68,10 @@
     background-color: palevioletred;
     font-size: 30px !important;
   }
+}
+
+.WholeNews {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
